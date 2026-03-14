@@ -1,5 +1,5 @@
 import type { LiftRecord } from "@/services/firebase";
-import { formatTimestamp } from "@/utils/analytics";
+import { formatTimestamp, mmToCm } from "@/utils/analytics";
 import { Shield, ShieldAlert } from "lucide-react";
 
 interface StatusCardProps {
@@ -39,7 +39,7 @@ const StatusCard = ({ record }: StatusCardProps) => {
       <div className="grid grid-cols-2 gap-3 text-sm">
         <div>
           <p className="text-muted-foreground text-xs">Alignment Diff</p>
-          <p className="font-mono tabular-nums text-foreground">{record.alignmentDiff.toFixed(2)} mm</p>
+          <p className="font-mono tabular-nums text-foreground">{mmToCm(record.alignmentDiff).toFixed(2)} cm</p>
         </div>
         <div>
           <p className="text-muted-foreground text-xs">Tilt X / Y</p>

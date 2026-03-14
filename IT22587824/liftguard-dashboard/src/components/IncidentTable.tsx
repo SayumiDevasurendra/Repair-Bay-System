@@ -1,5 +1,5 @@
 import type { LiftRecord } from "@/services/firebase";
-import { formatTimestamp, formatDate } from "@/utils/analytics";
+import { formatTimestamp, formatDate, mmToCm } from "@/utils/analytics";
 
 interface IncidentTableProps {
   records: LiftRecord[];
@@ -19,9 +19,9 @@ const IncidentTable = ({ records }: IncidentTableProps) => {
             <tr className="bg-muted text-muted-foreground text-xs uppercase tracking-wider">
               <th className="text-left p-2 font-medium">Date</th>
               <th className="text-left p-2 font-medium">Time</th>
-              <th className="text-right p-2 font-medium">Left</th>
-              <th className="text-right p-2 font-medium">Right</th>
-              <th className="text-right p-2 font-medium">Diff</th>
+              <th className="text-right p-2 font-medium">Left (cm)</th>
+              <th className="text-right p-2 font-medium">Right (cm)</th>
+              <th className="text-right p-2 font-medium">Diff (cm)</th>
               <th className="text-right p-2 font-medium">Tilt X</th>
               <th className="text-right p-2 font-medium">Tilt Y</th>
               <th className="text-center p-2 font-medium">Status</th>
@@ -37,9 +37,9 @@ const IncidentTable = ({ records }: IncidentTableProps) => {
               >
                 <td className="p-2 font-mono text-xs tabular-nums text-foreground">{formatDate(r.timestamp)}</td>
                 <td className="p-2 font-mono text-xs tabular-nums text-foreground">{formatTimestamp(r.timestamp)}</td>
-                <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{r.leftDistance.toFixed(2)}</td>
-                <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{r.rightDistance.toFixed(2)}</td>
-                <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{r.alignmentDiff.toFixed(2)}</td>
+                <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{mmToCm(r.leftDistance).toFixed(2)}</td>
+                <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{mmToCm(r.rightDistance).toFixed(2)}</td>
+                <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{mmToCm(r.alignmentDiff).toFixed(2)}</td>
                 <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{r.tiltX.toFixed(2)}</td>
                 <td className="p-2 text-right font-mono text-xs tabular-nums text-foreground">{r.tiltY.toFixed(2)}</td>
                 <td className="p-2 text-center">

@@ -9,6 +9,7 @@ import {
   getHourlyData,
   getPeakError,
   formatTimestamp,
+  mmToCm,
 } from "@/utils/analytics";
 import MetricCard from "@/components/MetricCard";
 import StatusCard from "@/components/StatusCard";
@@ -76,6 +77,12 @@ const Dashboard = () => {
   const smoothedData = calculateMovingAverage(todayRecords.length > 0 ? todayRecords : records.slice(-100));
   const hourlyData = getHourlyData(todayRecords);
   const peakError = getPeakError(todayRecords);
+  const smoothedDataCm = smoothedData.map((point) => ({
+    ...point,
+    smoothedDiff: mmToCm(point.smoothedDiff),
+    alignmentDiff: mmToCm(point.alignmentDiff),
+  }));
+  const hourlyDataCm = hourlyData.map((point) => ({ ...point, avg: mmToCm(point.avg) }));
 
   const todayAvg = getAverageAlignment(todayRecords);
   const yesterdayAvg = getAverageAlignment(yesterdayRecords);
@@ -132,20 +139,20 @@ const Dashboard = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <MetricCard
           label="Left Distance"
-          value={latestRecord?.leftDistance ?? 0}
-          unit="mm"
+          value={mmToCm(latestRecord?.leftDistance ?? 0)}
+          unit="cm"
           icon={<Ruler className="w-4 h-4" />}
         />
         <MetricCard
           label="Right Distance"
-          value={latestRecord?.rightDistance ?? 0}
-          unit="mm"
+          value={mmToCm(latestRecord?.rightDistance ?? 0)}
+          unit="cm"
           icon={<Ruler className="w-4 h-4" />}
         />
         <MetricCard
           label="Alignment Diff"
-          value={latestRecord?.alignmentDiff ?? 0}
-          unit="mm"
+          value={mmToCm(latestRecord?.alignmentDiff ?? 0)}
+          unit="cm"
           icon={<Activity className="w-4 h-4" />}
         />
         <MetricCard
@@ -158,7 +165,7 @@ const Dashboard = () => {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-4">
         <div className="lg:col-span-2">
-          <AlignmentChart data={smoothedData} />
+          <AlignmentChart data={smoothedDataCm} />
         </div>
         <div className="grid grid-rows-2 gap-3">
           <SafetyScore score={safetyScore} />
@@ -186,7 +193,7 @@ const Dashboard = () => {
             {trendPct > 0 ? "Worse" : "Better"} alignment than yesterday
           </p>
           <div className="mt-2 text-xs text-muted-foreground font-mono">
-            Today: {todayAvg.toFixed(2)} mm | Yesterday: {yesterdayAvg.toFixed(2)} mm
+            Today: {mmToCm(todayAvg).toFixed(2)} cm | Yesterday: {mmToCm(yesterdayAvg).toFixed(2)} cm
           </div>
         </div>
 
@@ -195,7 +202,7 @@ const Dashboard = () => {
           {peakError ? (
             <>
               <span className="text-xl font-bold font-mono tabular-nums status-unsafe-text">
-                {peakError.alignmentDiff.toFixed(2)} mm
+                {mmToCm(peakError.alignmentDiff).toFixed(2)} cm
               </span>
               <p className="text-muted-foreground text-xs mt-1 font-mono">
                 at {formatTimestamp(peakError.timestamp)}
@@ -210,7 +217,7 @@ const Dashboard = () => {
       {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
         <TiltChart data={(todayRecords.length > 0 ? todayRecords : records.slice(-100))} />
-        <HourlyRiskChart data={hourlyData} />
+        <HourlyRiskChart data={hourlyDataCm} />
       </div>
 
       {/* Incident Table */}

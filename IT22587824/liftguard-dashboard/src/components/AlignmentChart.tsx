@@ -8,7 +8,7 @@ interface AlignmentChartProps {
   threshold?: number;
 }
 
-const AlignmentChart = ({ data, threshold = 180 }: AlignmentChartProps) => (
+const AlignmentChart = ({ data, threshold = 18 }: AlignmentChartProps) => (
   <div className="card-surface p-4 h-full">
     <h3 className="text-muted-foreground text-sm font-medium mb-4 uppercase tracking-wider">
       Alignment Trend (Moving Avg)
@@ -30,7 +30,7 @@ const AlignmentChart = ({ data, threshold = 180 }: AlignmentChartProps) => (
             stroke="hsl(215 16% 47%)"
             fontSize={11}
             fontFamily="JetBrains Mono"
-            tickFormatter={(val) => `${val.toFixed(0)}`}
+            tickFormatter={(val) => `${val.toFixed(1)}`}
           />
           <Tooltip
             contentStyle={{
@@ -41,7 +41,7 @@ const AlignmentChart = ({ data, threshold = 180 }: AlignmentChartProps) => (
               fontSize: "12px",
             }}
             labelFormatter={(v) => formatTimestamp(v as number)}
-            formatter={(value: number) => [`${value.toFixed(2)} mm`, "Alignment"]}
+            formatter={(value: number) => [`${value.toFixed(2)} cm`, "Alignment"]}
           />
           <ReferenceLine
             y={threshold}

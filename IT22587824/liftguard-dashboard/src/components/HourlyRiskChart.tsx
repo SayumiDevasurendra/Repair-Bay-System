@@ -26,7 +26,7 @@ const HourlyRiskChart = ({ data }: HourlyRiskChartProps) => {
                 fontFamily: "JetBrains Mono",
                 fontSize: "12px",
               }}
-              formatter={(value: number) => [`${value.toFixed(2)} mm`, "Avg Alignment"]}
+                formatter={(value: number) => [`${value.toFixed(2)} cm`, "Avg Alignment"]}
             />
             <Bar dataKey="avg" isAnimationActive={false} radius={[4, 4, 0, 0]}>
               {data.map((entry, index) => (
@@ -35,7 +35,7 @@ const HourlyRiskChart = ({ data }: HourlyRiskChartProps) => {
                   fill={
                     entry.avg === maxAvg && entry.avg > 0
                       ? "hsl(0 84% 60%)"
-                      : entry.avg > 100
+                        : entry.avg > 10
                         ? "hsl(45 93% 47%)"
                         : "hsl(217 91% 60%)"
                   }

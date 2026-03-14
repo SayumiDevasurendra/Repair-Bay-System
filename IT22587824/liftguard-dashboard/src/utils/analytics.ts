@@ -1,5 +1,7 @@
 import type { LiftRecord } from "@/services/firebase";
 
+export const mmToCm = (value: number) => value / 10;
+
 export const calculateMovingAverage = (data: LiftRecord[], windowSize = 5) => {
   return data.map((val, idx, arr) => {
     const start = Math.max(0, idx - windowSize + 1);
@@ -62,11 +64,11 @@ export const formatDate = (ts: number) => {
 };
 
 export const exportToCSV = (records: LiftRecord[]) => {
-  const header = "timestamp,leftDistance,rightDistance,alignmentDiff,tiltX,tiltY,status\n";
+  const header = "timestamp,leftDistance_cm,rightDistance_cm,alignmentDiff_cm,tiltX,tiltY,status\n";
   const rows = records
     .map(
       (r) =>
-        `${new Date(r.timestamp).toISOString()},${r.leftDistance},${r.rightDistance},${r.alignmentDiff},${r.tiltX},${r.tiltY},${r.status}`
+        `${new Date(r.timestamp).toISOString()},${mmToCm(r.leftDistance)},${mmToCm(r.rightDistance)},${mmToCm(r.alignmentDiff)},${r.tiltX},${r.tiltY},${r.status}`
     )
     .join("\n");
   const blob = new Blob([header + rows], { type: "text/csv" });
