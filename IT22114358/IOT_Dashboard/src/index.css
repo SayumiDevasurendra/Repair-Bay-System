@@ -532,56 +532,207 @@ body {
 }
 
 /* System Info */
-.system-grid {
+/* Safety Guide & Status Panel */
+.safety-guide {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 16px;
 }
 
-.system-row {
+.safety-status-row {
   display: flex;
-  justify-content: space-between;
+  gap: 16px;
+}
+
+.safety-status-item {
+  flex: 1;
+  display: flex;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-color);
+  gap: 10px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 10px 14px;
 }
 
-.system-row:last-child {
-  border-bottom: none;
+.safety-status-item div {
+  display: flex;
+  flex-direction: column;
 }
 
-.system-label {
-  font-size: 12px;
+.status-title {
+  font-size: 11px;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.system-value {
-  font-size: 13px;
+.status-detail {
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  font-family: 'Courier New', monospace;
 }
 
-.fan-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.fan-indicator {
-  width: 10px;
-  height: 10px;
+.status-dot {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.fan-indicator.on {
+.status-dot.online {
+  background: var(--safe-green);
+  box-shadow: 0 0 8px var(--safe-green);
+}
+
+.status-dot.offline {
   background: var(--danger-red);
   box-shadow: 0 0 8px var(--danger-red);
   animation: pulse 1s ease-in-out infinite;
 }
 
-.fan-indicator.off {
+.status-dot.fan-active {
+  background: var(--danger-red);
+  box-shadow: 0 0 8px var(--danger-red);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.status-dot.fan-idle {
   background: var(--text-muted);
+}
+
+.safety-last-update {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 4px 0;
+}
+
+.safety-last-update strong {
+  color: var(--text-secondary);
+}
+
+.safety-section-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  margin: 0 0 8px 0;
+}
+
+.safety-levels-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.safety-level-card {
+  border-radius: 8px;
+  padding: 10px 14px;
+  border-left: 4px solid transparent;
+  background: var(--bg-primary);
+  opacity: 0.6;
+  transition: opacity 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.safety-level-card.active-level {
+  opacity: 1;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+}
+
+.safety-level-card.safe {
+  border-left-color: var(--safe-green);
+}
+
+.safety-level-card.warning {
+  border-left-color: var(--warning-amber);
+}
+
+.safety-level-card.danger {
+  border-left-color: var(--danger-red);
+}
+
+.safety-level-card.safe.active-level {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.safety-level-card.warning.active-level {
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.safety-level-card.danger.active-level {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.level-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.level-header strong {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.level-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.level-dot.safe-dot {
+  background: var(--safe-green);
+}
+
+.level-dot.warning-dot {
+  background: var(--warning-amber);
+}
+
+.level-dot.danger-dot {
+  background: var(--danger-red);
+}
+
+.safety-level-card p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.safety-emergency {
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+}
+
+.emergency-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emergency-list li {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.emergency-list li::before {
+  content: '!';
+  position: absolute;
+  left: 0;
+  color: var(--danger-red);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.emergency-list li strong {
+  color: var(--text-primary);
 }
 
 /* Footer */

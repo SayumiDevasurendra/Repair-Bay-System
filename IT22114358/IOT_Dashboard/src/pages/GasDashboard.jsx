@@ -70,7 +70,7 @@ function GasDashboard() {
             <AlertLog history={liveHistory} firebaseHistory={firebaseHistory} />
           </div>
           <div className="card card-system">
-            <h3 className="card-title">System Information</h3>
+            <h3 className="card-title">Safety Guide & Status</h3>
             <SystemInfo
               data={liveData}
               mqttStatus={mqttStatus}
