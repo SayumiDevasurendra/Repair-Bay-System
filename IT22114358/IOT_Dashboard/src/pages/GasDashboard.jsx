@@ -22,17 +22,22 @@ function GasDashboard() {
 
   return (
     <div className="app">
+      <div className="breadcrumb-bar">
+        <Link to="/" className="breadcrumb-link" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M10 13L5 8L10 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Dashboard
+        </Link>
+        <span className="breadcrumb-sep">/</span>
+        <span className="breadcrumb-current">Gas Leak Safety Monitoring</span>
+      </div>
       <Header
         connectionStatus={connectionStatus}
         lastUpdate={lastUpdate}
         mqttStatus={mqttStatus}
         firebaseStatus={firebaseStatus}
       />
-      <div className="breadcrumb-bar">
-        <Link to="/" className="breadcrumb-link">Dashboard</Link>
-        <span className="breadcrumb-sep">/</span>
-        <span className="breadcrumb-current">Gas Leak Safety Monitoring</span>
-      </div>
       <StatusBanner data={liveData} />
       <main className="dashboard">
         <div className="dashboard-grid">

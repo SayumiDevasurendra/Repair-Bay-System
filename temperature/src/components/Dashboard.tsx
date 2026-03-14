@@ -41,7 +41,7 @@ export default function Dashboard() {
               <h1 className="text-base sm:text-lg font-bold text-white leading-tight">
                 Repair Bay Temperature Monitor
               </h1>
-              <p className="text-slate-500 text-xs">Smart Automotive Repair Bay · IT4021</p>
+              <p className="text-slate-500 text-xs">Smart Automotive Repair Bay | Group 2026_21</p>
             </div>
           </div>
 
