@@ -77,18 +77,28 @@ function GasGauge({ data }) {
     danger: '#ef4444',
   };
 
-  // Tick marks
-  const ticks = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000];
-  const tickMarks = ticks.map((val) => {
+  // Tick marks — simplified labels
+  const ticks = [
+    { val: 0, label: 'Low' },
+    { val: 1000, label: '' },
+    { val: 2000, label: 'Med' },
+    { val: 2500, label: '' },
+    { val: 3000, label: '' },
+    { val: 4000, label: 'High' },
+  ];
+  const tickMarks = ticks.map(({ val, label }) => {
     const deg = zoneDeg(val);
     const outerR = r + 2;
     const innerR = r - 8;
     const outer = { x: cx + outerR * Math.cos(toRad(deg)), y: cy - outerR * Math.sin(toRad(deg)) };
     const inner = { x: cx + innerR * Math.cos(toRad(deg)), y: cy - innerR * Math.sin(toRad(deg)) };
     const labelR = r - 18;
-    const label = { x: cx + labelR * Math.cos(toRad(deg)), y: cy - labelR * Math.sin(toRad(deg)) };
-    return { val, outer, inner, label };
+    const labelPos = { x: cx + labelR * Math.cos(toRad(deg)), y: cy - labelR * Math.sin(toRad(deg)) };
+    return { val, label, outer, inner, labelPos };
   });
+
+  // Percentage for user-friendly display
+  const percent = Math.round((rawValue / maxValue) * 100);
 
   return (
     <div className="gauge-container">
@@ -110,9 +120,11 @@ function GasGauge({ data }) {
         {tickMarks.map((t, i) => (
           <g key={i}>
             <line x1={t.outer.x} y1={t.outer.y} x2={t.inner.x} y2={t.inner.y} stroke="#475569" strokeWidth="1.5" />
-            <text x={t.label.x} y={t.label.y} textAnchor="middle" dominantBaseline="middle" fill="#64748b" fontSize="7" fontFamily="Inter, sans-serif">
-              {t.val >= 1000 ? `${t.val / 1000}k` : t.val}
-            </text>
+            {t.label && (
+              <text x={t.labelPos.x} y={t.labelPos.y} textAnchor="middle" dominantBaseline="middle" fill="#64748b" fontSize="7" fontFamily="Inter, sans-serif">
+                {t.label}
+              </text>
+            )}
           </g>
         ))}
 
@@ -130,12 +142,12 @@ function GasGauge({ data }) {
         <circle cx={cx} cy={cy} r="3" fill={colorMap[level]} opacity="0.6" />
       </svg>
 
-      <div className={`gauge-value ${level}`}>{rawValue}</div>
-      <div className="gauge-label">Raw ADC Value (0 - 4095)</div>
+      <div className={`gauge-value ${level}`}>{percent}%</div>
+      <div className="gauge-label">Gas Level Intensity</div>
       <div className="gauge-thresholds">
-        <span><span className="threshold-dot safe"></span> &lt;2000 Safe</span>
-        <span><span className="threshold-dot warning"></span> 2000-2500 Warning</span>
-        <span><span className="threshold-dot danger"></span> &gt;2500 Danger</span>
+        <span><span className="threshold-dot safe"></span> Safe</span>
+        <span><span className="threshold-dot warning"></span> Warning</span>
+        <span><span className="threshold-dot danger"></span> Danger</span>
       </div>
     </div>
   );

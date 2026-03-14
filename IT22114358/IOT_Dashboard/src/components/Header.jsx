@@ -18,11 +18,11 @@ function Header({ connectionStatus, lastUpdate, mqttStatus, firebaseStatus }) {
         <div className="connection-badges">
           <div className={`connection-badge ${mqttStatus === 'connected' ? 'connected' : mqttStatus === 'reconnecting' ? 'connecting' : 'error'}`}>
             <span className="connection-dot"></span>
-            MQTT: {mqttStatus === 'connected' ? 'Live' : mqttStatus === 'reconnecting' ? 'Reconnecting' : mqttStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+            Live Sensor: {mqttStatus === 'connected' ? 'Active' : mqttStatus === 'reconnecting' ? 'Reconnecting' : mqttStatus === 'connecting' ? 'Connecting...' : 'Offline'}
           </div>
           <div className={`connection-badge ${firebaseStatus === 'connected' ? 'connected' : firebaseStatus === 'connecting' ? 'connecting' : 'error'}`}>
             <span className="connection-dot"></span>
-            Firebase: {firebaseStatus === 'connected' ? 'Connected' : firebaseStatus === 'connecting' ? 'Connecting...' : 'Error'}
+            History: {firebaseStatus === 'connected' ? 'Saving' : firebaseStatus === 'connecting' ? 'Connecting...' : 'Unavailable'}
           </div>
         </div>
       </div>

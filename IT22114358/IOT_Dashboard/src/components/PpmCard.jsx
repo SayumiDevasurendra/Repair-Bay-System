@@ -9,7 +9,6 @@ function PpmCard({ data }) {
   }
 
   const ppm = parseFloat(data['PPM']) || 0;
-  const voltage = parseFloat(data['Voltage']) || 0;
   const level = (data['Level'] || 'SAFE').toLowerCase();
 
   // PPM bar width (scale 0-30 PPM range for visual)
@@ -25,7 +24,7 @@ function PpmCard({ data }) {
           {ppm.toFixed(2)}
           <span className="ppm-unit">PPM</span>
         </span>
-        <div className="ppm-voltage">Sensor Voltage: {voltage.toFixed(2)}V</div>
+        <div className="ppm-subtitle">Parts Per Million (gas in air)</div>
       </div>
       <div className="ppm-bar">
         <div

@@ -2,12 +2,14 @@ import { useMqttData } from '../hooks/useMqttData';
 import { useFirebaseHistory } from '../hooks/useGasData';
 import Header from '../components/Header';
 import StatusBanner from '../components/StatusBanner';
+import TodaySummary from '../components/TodaySummary';
 import GasGauge from '../components/GasGauge';
 import PpmCard from '../components/PpmCard';
 import TrendChart from '../components/TrendChart';
 import AnalyticsPanel from '../components/AnalyticsPanel';
 import AlertLog from '../components/AlertLog';
 import SystemInfo from '../components/SystemInfo';
+import ShiftSafety from '../components/ShiftSafety';
 import { Link } from 'react-router-dom';
 
 function GasDashboard() {
@@ -40,9 +42,12 @@ function GasDashboard() {
       />
       <StatusBanner data={liveData} />
       <main className="dashboard">
+        {/* Today's Summary KPI Bar */}
+        <TodaySummary liveHistory={liveHistory} firebaseHistory={firebaseHistory} />
+
         <div className="dashboard-grid">
           <div className="card card-gauge">
-            <h3 className="card-title">Gas Level (Raw ADC) <span className="live-tag">LIVE</span></h3>
+            <h3 className="card-title">Gas Level Meter <span className="live-tag">LIVE</span></h3>
             <GasGauge data={liveData} />
           </div>
           <div className="card card-ppm">
@@ -50,7 +55,7 @@ function GasDashboard() {
             <PpmCard data={liveData} />
           </div>
           <div className="card card-analytics">
-            <h3 className="card-title">Edge AI Analytics <span className="live-tag">LIVE</span></h3>
+            <h3 className="card-title">Smart Analysis <span className="live-tag">LIVE</span></h3>
             <AnalyticsPanel data={liveData} />
           </div>
           <div className="card card-chart">
@@ -61,7 +66,7 @@ function GasDashboard() {
           </div>
           <div className="card card-chart">
             <h3 className="card-title">
-              Historical Trend (Firebase) <span className="history-tag">60s intervals</span>
+              Historical Trend <span className="history-tag">60s intervals</span>
             </h3>
             <TrendChart history={firebaseHistory} />
           </div>
@@ -76,6 +81,10 @@ function GasDashboard() {
               mqttStatus={mqttStatus}
               firebaseStatus={firebaseStatus}
             />
+          </div>
+          <div className="card card-shift">
+            <h3 className="card-title">Shift Safety Score</h3>
+            <ShiftSafety liveHistory={liveHistory} firebaseHistory={firebaseHistory} />
           </div>
         </div>
       </main>
