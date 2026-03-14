@@ -1,0 +1,48 @@
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from "recharts";
+import { formatTimestamp } from "@/utils/analytics";
+
+interface TiltChartProps {
+  data: Array<{ timestamp: number; tiltX: number; tiltY: number }>;
+}
+
+const TiltChart = ({ data }: TiltChartProps) => (
+  <div className="card-surface p-4 h-full">
+    <h3 className="text-muted-foreground text-sm font-medium mb-4 uppercase tracking-wider">
+      Tilt Stability
+    </h3>
+    <div className="h-[280px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(217 20% 20%)" vertical={false} />
+          <XAxis
+            dataKey="timestamp"
+            tickFormatter={(v) => formatTimestamp(v)}
+            stroke="hsl(215 16% 47%)"
+            fontSize={10}
+            fontFamily="JetBrains Mono"
+            interval="preserveStartEnd"
+            minTickGap={60}
+          />
+          <YAxis stroke="hsl(215 16% 47%)" fontSize={11} fontFamily="JetBrains Mono" tickFormatter={(v) => `${v.toFixed(0)}°`} />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "hsl(222 47% 11%)",
+              border: "1px solid hsl(217 20% 25%)",
+              borderRadius: "8px",
+              fontFamily: "JetBrains Mono",
+              fontSize: "12px",
+            }}
+            labelFormatter={(v) => formatTimestamp(v as number)}
+          />
+          <Legend wrapperStyle={{ fontSize: "11px", fontFamily: "JetBrains Mono" }} />
+          <Line type="monotone" dataKey="tiltX" stroke="hsl(45 93% 47%)" strokeWidth={1.5} dot={false} isAnimationActive={false} name="Tilt X" />
+          <Line type="monotone" dataKey="tiltY" stroke="hsl(280 70% 60%)" strokeWidth={1.5} dot={false} isAnimationActive={false} name="Tilt Y" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+);
+
+export default TiltChart;

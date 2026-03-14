@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+
+    --card: 217 33% 14%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 217 33% 14%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 215 20% 22%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 20% 18%;
+    --muted-foreground: 215 16% 57%;
+
+    --accent: 215 20% 22%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --status-safe: 142 71% 45%;
+    --status-safe-foreground: 0 0% 100%;
+    --status-unsafe: 0 84% 60%;
+    --status-unsafe-foreground: 0 0% 100%;
+    --status-warning: 45 93% 47%;
+    --status-warning-foreground: 0 0% 0%;
+
+    --border: 217 20% 20%;
+    --input: 217 20% 20%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 222 47% 9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 215 20% 18%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 20% 20%;
+    --sidebar-ring: 217 91% 60%;
+
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-sans: 'Inter', sans-serif;
+
+    --card-inset-border: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: var(--font-sans);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-surface {
+    @apply bg-card rounded-xl;
+    box-shadow: var(--card-inset-border);
+  }
+
+  .status-safe {
+    @apply bg-[hsl(var(--status-safe))];
+  }
+
+  .status-unsafe {
+    @apply bg-[hsl(var(--status-unsafe))];
+  }
+
+  .status-safe-text {
+    color: hsl(var(--status-safe));
+  }
+
+  .status-unsafe-text {
+    color: hsl(var(--status-unsafe));
+  }
+
+  .status-warning-text {
+    color: hsl(var(--status-warning));
+  }
+
+  @keyframes pulse-unsafe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .animate-pulse-unsafe {
+    animation: pulse-unsafe 1.5s ease-in-out infinite;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+}
