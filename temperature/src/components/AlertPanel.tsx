@@ -13,6 +13,7 @@ const PAGE_SIZE = 10
 export default function AlertPanel({ alerts, onClear }: Props) {
   const [page, setPage] = useState(1)
   const dangerCount = alerts.filter((a) => a.status === 'DANGER').length
+  const warningCount = alerts.filter((a) => a.status === 'WARNING').length
   const totalPages = Math.max(1, Math.ceil(alerts.length / PAGE_SIZE))
   const paginated = alerts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
@@ -36,6 +37,11 @@ export default function AlertPanel({ alerts, onClear }: Props) {
           {alerts.length > 0 && (
             <span className="ml-1 bg-slate-700 text-slate-300 border border-slate-600 text-xs px-2 py-0.5 rounded-full">
               {alerts.length} total
+            </span>
+          )}
+          {warningCount > 0 && (
+            <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              {warningCount} WARNING
             </span>
           )}
           {dangerCount > 0 && (
