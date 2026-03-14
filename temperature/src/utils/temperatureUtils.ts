@@ -3,7 +3,7 @@ import { deriveStatus } from '../types/temperature'
 
 export function formatTimestamp(ts: string): string {
   const date = new Date(ts.replace(' ', 'T'))
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 }
 
 export function formatDate(ts: string): string {
