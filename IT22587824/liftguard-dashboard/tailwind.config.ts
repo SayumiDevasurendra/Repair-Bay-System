@@ -54,6 +54,11 @@ export default {
         "status-safe": "hsl(var(--status-safe))",
         "status-unsafe": "hsl(var(--status-unsafe))",
         "status-warning": "hsl(var(--status-warning))",
+        "accent-cyan":   "hsl(var(--accent-cyan))",
+        "accent-purple": "hsl(var(--accent-purple))",
+        "accent-amber":  "hsl(var(--accent-amber))",
+        "accent-teal":   "hsl(var(--accent-teal))",
+        "accent-rose":   "hsl(var(--accent-rose))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

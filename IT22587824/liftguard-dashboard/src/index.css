@@ -43,6 +43,13 @@
 
     --radius: 0.75rem;
 
+    /* Accent palette */
+    --accent-cyan:   189 94% 43%;
+    --accent-purple: 262 80% 65%;
+    --accent-amber:  38  92% 50%;
+    --accent-teal:   172 66% 40%;
+    --accent-rose:   346 84% 61%;
+
     --sidebar-background: 222 47% 9%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 217 91% 60%;
@@ -101,6 +108,29 @@
   .status-warning-text {
     color: hsl(var(--status-warning));
   }
+
+  /* Accent text helpers */
+  .text-accent-cyan   { color: hsl(var(--accent-cyan)); }
+  .text-accent-purple { color: hsl(var(--accent-purple)); }
+  .text-accent-amber  { color: hsl(var(--status-warning)); }
+  .text-accent-teal   { color: hsl(var(--accent-teal)); }
+  .text-accent-rose   { color: hsl(var(--accent-rose)); }
+
+  /* Colored left-border card variants */
+  .card-accent-blue   { border-left: 4px solid hsl(var(--primary)); }
+  .card-accent-cyan   { border-left: 4px solid hsl(var(--accent-cyan)); }
+  .card-accent-purple { border-left: 4px solid hsl(var(--accent-purple)); }
+  .card-accent-amber  { border-left: 4px solid hsl(var(--status-warning)); }
+  .card-accent-teal   { border-left: 4px solid hsl(var(--accent-teal)); }
+  .card-accent-rose   { border-left: 4px solid hsl(var(--accent-rose)); }
+
+  /* Glow backgrounds for icon badges */
+  .icon-bg-blue   { background: hsl(var(--primary)   / 0.15); color: hsl(var(--primary)); }
+  .icon-bg-cyan   { background: hsl(var(--accent-cyan)   / 0.15); color: hsl(var(--accent-cyan)); }
+  .icon-bg-purple { background: hsl(var(--accent-purple) / 0.15); color: hsl(var(--accent-purple)); }
+  .icon-bg-amber  { background: hsl(var(--status-warning)/ 0.15); color: hsl(var(--status-warning)); }
+  .icon-bg-teal   { background: hsl(var(--accent-teal)   / 0.15); color: hsl(var(--accent-teal)); }
+  .icon-bg-rose   { background: hsl(var(--accent-rose)   / 0.15); color: hsl(var(--accent-rose)); }
 
   @keyframes pulse-unsafe {
     0%, 100% { opacity: 1; }

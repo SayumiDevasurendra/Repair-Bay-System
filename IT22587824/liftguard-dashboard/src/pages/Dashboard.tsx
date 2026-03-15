@@ -20,7 +20,7 @@ import PieChartComponent from "@/components/PieChartComponent";
 import HourlyRiskChart from "@/components/HourlyRiskChart";
 import IncidentTable from "@/components/IncidentTable";
 import ExportButton from "@/components/ExportButton";
-import { Activity, ArrowDown, ArrowUp, AlertTriangle, Ruler, RotateCcw } from "lucide-react";
+import { Activity, ArrowDown, ArrowUp, AlertTriangle, Ruler, RotateCcw, TrendingUp, Zap } from "lucide-react";
 
 const Dashboard = () => {
   const [records, setRecords] = useState<LiftRecord[]>([]);
@@ -142,23 +142,27 @@ const Dashboard = () => {
           value={mmToCm(latestRecord?.leftDistance ?? 0)}
           unit="cm"
           icon={<Ruler className="w-4 h-4" />}
+          color="cyan"
         />
         <MetricCard
           label="Right Distance"
           value={mmToCm(latestRecord?.rightDistance ?? 0)}
           unit="cm"
           icon={<Ruler className="w-4 h-4" />}
+          color="purple"
         />
         <MetricCard
           label="Alignment Diff"
           value={mmToCm(latestRecord?.alignmentDiff ?? 0)}
           unit="cm"
           icon={<Activity className="w-4 h-4" />}
+          color="amber"
         />
         <MetricCard
           label="Tilt (X / Y)"
           value={`${(latestRecord?.tiltX ?? 0).toFixed(1)}° / ${(latestRecord?.tiltY ?? 0).toFixed(1)}°`}
           unit=""
+          color="teal"
         />
       </div>
 
@@ -177,8 +181,13 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
         <StatusCard record={latestRecord} />
 
-        <div className="card-surface p-4 flex flex-col justify-center">
-          <p className="text-muted-foreground text-xs uppercase tracking-wider font-medium mb-2">Alignment Trend</p>
+        <div className="card-surface p-4 flex flex-col justify-center card-accent-blue">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="p-1.5 rounded-md icon-bg-blue">
+              <TrendingUp className="w-4 h-4" />
+            </span>
+            <p className="text-muted-foreground text-xs uppercase tracking-wider font-medium">Alignment Trend</p>
+          </div>
           <div className="flex items-center gap-2">
             {trendPct > 0 ? (
               <ArrowUp className="w-5 h-5 status-unsafe-text" />
@@ -197,11 +206,16 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="card-surface p-4 flex flex-col justify-center">
-          <p className="text-muted-foreground text-xs uppercase tracking-wider font-medium mb-2">Peak Error Today</p>
+        <div className="card-surface p-4 flex flex-col justify-center card-accent-rose">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="p-1.5 rounded-md icon-bg-rose">
+              <Zap className="w-4 h-4" />
+            </span>
+            <p className="text-muted-foreground text-xs uppercase tracking-wider font-medium">Peak Error Today</p>
+          </div>
           {peakError ? (
             <>
-              <span className="text-xl font-bold font-mono tabular-nums status-unsafe-text">
+              <span className="text-xl font-bold font-mono tabular-nums text-accent-rose">
                 {mmToCm(peakError.alignmentDiff).toFixed(2)} cm
               </span>
               <p className="text-muted-foreground text-xs mt-1 font-mono">
