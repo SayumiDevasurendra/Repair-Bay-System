@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BellOff, AlertTriangle, Flame, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BellOff, AlertTriangle, Flame, ChevronLeft, ChevronRight, Download } from 'lucide-react'
 import type { TemperatureReading } from '../types/temperature'
 import { formatTimestamp, formatDate } from '../utils/temperatureUtils'
 
@@ -28,6 +28,28 @@ export default function AlertPanel({ alerts, onClear }: Props) {
   function handleFilter(f: FilterType) {
     setFilter((prev) => prev === f ? 'all' : f)
     setPage(1)
+  }
+
+  function exportCSV() {
+    const escape = (v: string) => `"${v.replace(/"/g, '""')}"`
+    const rows = [
+      ['Date', 'Time', 'Temperature (C)', 'Temperature (F)', 'Status'],
+      ...filtered.map((a) => [
+        a.timestamp.slice(0, 10).replace(/-/g, '/'),  // YYYY/MM/DD
+        formatTimestamp(a.timestamp),
+        a.temperature_c.toFixed(1),
+        String(Math.round((a.temperature_c * 9) / 5 + 32)),
+        a.status,
+      ]),
+    ]
+    const csv = rows.map((r) => r.map(escape).join(',')).join('\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `alert-log${filter !== 'all' ? `-${filter.toLowerCase()}` : ''}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -79,15 +101,26 @@ export default function AlertPanel({ alerts, onClear }: Props) {
             </button>
           )}
         </h3>
-        {alerts.length > 0 && (
-          <button
-            onClick={() => { onClear(); setPage(1); setFilter('all') }}
-            className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"
-          >
-            <BellOff className="w-3.5 h-3.5" />
-            Clear
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {filtered.length > 0 && (
+            <button
+              onClick={exportCSV}
+              className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Export CSV
+            </button>
+          )}
+          {alerts.length > 0 && (
+            <button
+              onClick={() => { onClear(); setPage(1); setFilter('all') }}
+              className="flex items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors"
+            >
+              <BellOff className="w-3.5 h-3.5" />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Alert rows */}
