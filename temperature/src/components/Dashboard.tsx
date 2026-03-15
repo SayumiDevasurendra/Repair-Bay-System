@@ -19,8 +19,8 @@ export default function Dashboard() {
   const isDanger  = current.status === 'DANGER'
   const isWarning = current.status === 'WARNING'
 
-  const headerIcon = isDanger ? 'text-red-400' : isWarning ? 'text-blue-400' : 'text-green-400'
-  const headerBg   = isDanger ? 'bg-red-500/20' : isWarning ? 'bg-blue-500/20' : 'bg-green-500/20'
+  const headerIcon = isDanger ? 'text-red-400' : isWarning ? 'text-yellow-400' : 'text-green-400'
+  const headerBg   = isDanger ? 'bg-red-500/20' : isWarning ? 'bg-yellow-500/20' : 'bg-green-500/20'
 
   return (
     <div className={`min-h-screen bg-slate-900 text-white transition-colors duration-500
@@ -85,7 +85,7 @@ export default function Dashboard() {
 
           {/* Gauge */}
           <div className={`bg-slate-800/60 border rounded-2xl p-6 flex flex-col items-center gap-4 transition-all duration-500
-            ${isDanger ? 'border-red-500/60 shadow-red-900/40 shadow-2xl' : isWarning ? 'border-blue-500/40' : 'border-slate-700'}`}>
+            ${isDanger ? 'border-red-500/60 shadow-red-900/40 shadow-2xl' : isWarning ? 'border-yellow-500/40' : 'border-slate-700'}`}>
             <div className="flex items-center justify-between w-full">
               <h2 className="text-slate-300 font-semibold text-sm uppercase tracking-wider">Gauge</h2>
               <Wifi className={`w-4 h-4 ${paused ? 'text-slate-600' : connected ? 'text-green-400' : 'text-red-400'}`} />
@@ -103,7 +103,7 @@ export default function Dashboard() {
                 value={`${current.temperature_c.toFixed(1)}°C`}
                 subValue={`${toFahrenheit(current.temperature_c)}°F`}
                 icon={<Thermometer className="w-5 h-5" style={{ color: threshold.color }} />}
-                colorClass={isDanger ? 'border-red-500/30' : isWarning ? 'border-blue-500/30' : 'border-green-500/30'}
+                colorClass={isDanger ? 'border-red-500/30' : isWarning ? 'border-yellow-500/30' : 'border-green-500/30'}
               />
               <StatCard
                 label="Min (all readings)"

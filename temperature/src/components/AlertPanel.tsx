@@ -81,8 +81,8 @@ export default function AlertPanel({ alerts, onClear }: Props) {
               onClick={() => handleFilter('WARNING')}
               className={`text-xs font-bold px-2 py-0.5 rounded-full border transition-all ${
                 filter === 'WARNING'
-                  ? 'bg-blue-500 border-blue-400 text-white ring-2 ring-blue-400/40'
-                  : 'bg-blue-500/20 border-blue-500/40 text-blue-300 hover:bg-blue-500 hover:text-white'
+                  ? 'bg-yellow-500 border-yellow-400 text-white ring-2 ring-yellow-400/40'
+                  : 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500 hover:text-white'
               }`}
             >
               {warningCount} WARNING
@@ -151,7 +151,7 @@ export default function AlertPanel({ alerts, onClear }: Props) {
                   <tr
                     key={alert.id}
                     className={`border-t border-slate-700/50 transition-colors
-                      ${isFire ? 'hover:bg-red-500/5' : 'hover:bg-blue-500/5'}`}
+                      ${isFire ? 'hover:bg-red-500/5' : 'hover:bg-yellow-500/5'}`}
                   >
                     <td className="px-4 py-2.5 text-slate-500 text-xs">{rowNum}</td>
                     <td className="px-4 py-2.5 text-slate-300">
@@ -160,7 +160,7 @@ export default function AlertPanel({ alerts, onClear }: Props) {
                     <td className="px-4 py-2.5 text-slate-300 font-mono">
                       {formatTimestamp(alert.timestamp)}
                     </td>
-                    <td className={`px-4 py-2.5 text-right font-mono font-semibold ${isFire ? 'text-red-300' : 'text-blue-300'}`}>
+                    <td className={`px-4 py-2.5 text-right font-mono font-semibold ${isFire ? 'text-red-300' : 'text-yellow-300'}`}>
                       {alert.temperature_c.toFixed(1)}
                     </td>
                     <td className="px-4 py-2.5 text-right font-mono text-slate-400">
@@ -170,7 +170,7 @@ export default function AlertPanel({ alerts, onClear }: Props) {
                       <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full
                         ${isFire
                           ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                          : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
                         }`}>
                         {isFire
                           ? <Flame className="w-3 h-3" />

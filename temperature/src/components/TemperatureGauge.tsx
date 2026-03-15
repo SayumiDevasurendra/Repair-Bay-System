@@ -18,7 +18,7 @@ const BULB_R = 22
 
 const ZONE_COLORS = [
   { min: 20, max: 50, color: '#22c55e' },
-  { min: 50, max: 70, color: '#3b82f6' },
+  { min: 50, max: 70, color: '#eab308' },
   { min: 70, max: 85, color: '#ef4444' },
 ]
 
@@ -193,7 +193,7 @@ export default function TemperatureGauge({ temperature }: Props) {
         })}
 
         {/* Threshold labels */}
-        <text x={TUBE_X - TUBE_WIDTH / 2 - 6} y={tempToY(50)} dominantBaseline="middle" textAnchor="end" fill="#3b82f6" fontSize="8" opacity="0.8">50°</text>
+        <text x={TUBE_X - TUBE_WIDTH / 2 - 6} y={tempToY(50)} dominantBaseline="middle" textAnchor="end" fill="#eab308" fontSize="8" opacity="0.8">50°</text>
         <text x={TUBE_X - TUBE_WIDTH / 2 - 6} y={tempToY(70)} dominantBaseline="middle" textAnchor="end" fill="#ef4444" fontSize="8" opacity="0.8">70°</text>
 
         {/* Temperature readout */}

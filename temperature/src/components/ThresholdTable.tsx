@@ -2,7 +2,7 @@ import { THRESHOLDS } from '../types/temperature'
 
 const ROWS = [
   { range: '< 50°C',    led: 'Green LED',  desc: 'Garage environment is safe',         ...THRESHOLDS[0] },
-  { range: '50 – 70°C', led: 'Blue LED',   desc: 'High temperature — inspect garage',  ...THRESHOLDS[1] },
+  { range: '50 – 70°C', led: 'Yellow LED', desc: 'High temperature — inspect garage',  ...THRESHOLDS[1] },
   { range: '≥ 70°C',    led: 'Red LED + Buzzer', desc: 'Danger — take immediate action', ...THRESHOLDS[2] },
 ]
 

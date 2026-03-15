@@ -20,7 +20,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const temp = payload[0].value as number
     const getColor = (t: number) =>
-      t >= 70 ? '#ef4444' : t >= 50 ? '#3b82f6' : '#22c55e'
+      t >= 70 ? '#ef4444' : t >= 50 ? '#eab308' : '#22c55e'
     return (
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 shadow-xl">
         <p className="text-slate-400 text-xs mb-1">{label}</p>
@@ -36,7 +36,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 function getGradientColor(temp: number) {
   if (temp >= 70) return '#ef4444'
-  if (temp >= 50) return '#3b82f6'
+  if (temp >= 50) return '#eab308'
   return '#22c55e'
 }
 
@@ -113,7 +113,7 @@ export default function TemperatureChart({ history }: Props) {
                 tickFormatter={(v) => `${v}°`}
               />
               <Tooltip content={<CustomTooltip />} />
-              <ReferenceLine y={50} stroke="#3b82f6" strokeDasharray="4 4" strokeOpacity={0.6} label={{ value: 'WARNING 50°', fill: '#3b82f6', fontSize: 9, position: 'insideTopRight' }} />
+              <ReferenceLine y={50} stroke="#eab308" strokeDasharray="4 4" strokeOpacity={0.6} label={{ value: 'WARNING 50°', fill: '#eab308', fontSize: 9, position: 'insideTopRight' }} />
               <ReferenceLine y={70} stroke="#ef4444" strokeDasharray="4 4" strokeOpacity={0.6} label={{ value: 'DANGER 70°', fill: '#ef4444', fontSize: 9, position: 'insideTopRight' }} />
               <Area
                 type="monotone"
