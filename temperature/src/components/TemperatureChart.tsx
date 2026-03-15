@@ -54,8 +54,7 @@ export default function TemperatureChart({ history }: Props) {
     temp: r.temperature_c,
   }))
 
-  const latestTemp = filtered[filtered.length - 1]?.temperature_c ?? 28
-  const lineColor = getGradientColor(latestTemp)
+  const lineColor = filter === 'alerts' ? '#ef4444' : '#22c55e'
 
   return (
     <div className="flex flex-col gap-3">
