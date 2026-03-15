@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BellOff, AlertTriangle, Flame, ChevronLeft, ChevronRight, Download } from 'lucide-react'
 import type { TemperatureReading } from '../types/temperature'
-import { formatTimestamp, formatDate } from '../utils/temperatureUtils'
+import { formatTimestamp } from '../utils/temperatureUtils'
 
 interface Props {
   alerts: Array<TemperatureReading & { id: number }>
@@ -123,37 +123,68 @@ export default function AlertPanel({ alerts, onClear }: Props) {
         </div>
       </div>
 
-      {/* Alert rows */}
-      <div className="flex flex-col gap-2">
-        {filtered.length === 0 ? (
-          <p className="text-slate-500 text-sm text-center py-4">No alerts — all clear</p>
-        ) : (
-          paginated.map((alert) => {
-            const isFire = alert.status === 'DANGER'
-            return (
-              <div
-                key={alert.id}
-                className={`flex items-start gap-3 rounded-lg p-3 text-sm border
-                  ${isFire
-                    ? 'bg-red-500/10 border-red-500/30 text-red-300'
-                    : 'bg-blue-500/10 border-blue-500/30 text-blue-300'
-                  }`}
-              >
-                {isFire ? (
-                  <Flame className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
-                ) : (
-                  <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-blue-400" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold">{alert.status}</p>
-                  <p className="text-xs opacity-80">
-                    {alert.temperature_c.toFixed(1)}°C · {formatDate(alert.timestamp)} · {formatTimestamp(alert.timestamp)}
-                  </p>
-                </div>
-              </div>
-            )
-          })
-        )}
+      {/* Alert table */}
+      <div className="overflow-x-auto rounded-lg border border-slate-700">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-700/60 text-slate-400 text-xs uppercase tracking-wider">
+              <th className="px-4 py-2.5 text-left">#</th>
+              <th className="px-4 py-2.5 text-left">Date</th>
+              <th className="px-4 py-2.5 text-left">Time</th>
+              <th className="px-4 py-2.5 text-right">Temp (°C)</th>
+              <th className="px-4 py-2.5 text-right">Temp (°F)</th>
+              <th className="px-4 py-2.5 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="text-slate-500 text-sm text-center py-6">
+                  No alerts — all clear
+                </td>
+              </tr>
+            ) : (
+              paginated.map((alert, i) => {
+                const isFire = alert.status === 'DANGER'
+                const rowNum = (page - 1) * PAGE_SIZE + i + 1
+                return (
+                  <tr
+                    key={alert.id}
+                    className={`border-t border-slate-700/50 transition-colors
+                      ${isFire ? 'hover:bg-red-500/5' : 'hover:bg-blue-500/5'}`}
+                  >
+                    <td className="px-4 py-2.5 text-slate-500 text-xs">{rowNum}</td>
+                    <td className="px-4 py-2.5 text-slate-300">
+                      {alert.timestamp.slice(0, 10).replace(/-/g, '/')}
+                    </td>
+                    <td className="px-4 py-2.5 text-slate-300 font-mono">
+                      {formatTimestamp(alert.timestamp)}
+                    </td>
+                    <td className={`px-4 py-2.5 text-right font-mono font-semibold ${isFire ? 'text-red-300' : 'text-blue-300'}`}>
+                      {alert.temperature_c.toFixed(1)}
+                    </td>
+                    <td className="px-4 py-2.5 text-right font-mono text-slate-400">
+                      {Math.round((alert.temperature_c * 9) / 5 + 32)}
+                    </td>
+                    <td className="px-4 py-2.5 text-center">
+                      <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full
+                        ${isFire
+                          ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                          : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        }`}>
+                        {isFire
+                          ? <Flame className="w-3 h-3" />
+                          : <AlertTriangle className="w-3 h-3" />
+                        }
+                        {alert.status}
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Pagination */}
