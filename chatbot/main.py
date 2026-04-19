@@ -9,7 +9,7 @@ import os
 app = FastAPI()
 
 # 🔑 Your OpenRouter API key
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 # Load FAISS index
 if not os.path.exists("vector.index"):
