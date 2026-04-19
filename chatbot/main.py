@@ -20,7 +20,7 @@ app.add_middleware(
 # 🔑 Your OpenRouter API key
 OPENROUTER_API_KEY = os.getenv(
     "OPENROUTER_API_KEY",
-    "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",
+    "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",
 )
 
 # Load FAISS index
