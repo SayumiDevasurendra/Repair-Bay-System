@@ -4,6 +4,7 @@ import GasDashboard from './pages/GasDashboard';
 import TemperatureDashboard from './pages/TemperatureDashboard';
 import NoiseDashboard from './pages/NoiseDashboard';
 import VehicleLiftDashboard from './pages/VehicleLiftDashboard';
+import ChatbotPopup from './components/ChatbotPopup';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/noise-monitoring" element={<NoiseDashboard />} />
         <Route path="/vehicle-lift-monitoring" element={<VehicleLiftDashboard />} />
       </Routes>
+      <ChatbotPopup />
     </BrowserRouter>
   );
 }

@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import faiss
 import pickle
@@ -8,8 +9,19 @@ import os
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 🔑 Your OpenRouter API key
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = os.getenv(
+    "OPENROUTER_API_KEY",
+    "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",
+)
 
 # Load FAISS index
 if not os.path.exists("vector.index"):
