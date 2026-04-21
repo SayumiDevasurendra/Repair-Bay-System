@@ -1,6 +1,8 @@
 import type { LiftRecord } from "@/services/firebase";
 
-export const mmToCm = (value: number) => value / 10;
+// ESP32 now publishes distance values directly in centimeters.
+// Keep this utility name to avoid wide refactors in UI components.
+export const mmToCm = (value: number) => value;
 
 export const calculateMovingAverage = (data: LiftRecord[], windowSize = 5) => {
   return data.map((val, idx, arr) => {

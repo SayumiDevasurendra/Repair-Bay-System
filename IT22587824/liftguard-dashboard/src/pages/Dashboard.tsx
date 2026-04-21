@@ -20,6 +20,7 @@ import PieChartComponent from "@/components/PieChartComponent";
 import HourlyRiskChart from "@/components/HourlyRiskChart";
 import IncidentTable from "@/components/IncidentTable";
 import ExportButton from "@/components/ExportButton";
+import LiftVehicleAnimation from "@/components/LiftVehicleAnimation";
 import { Activity, ArrowDown, ArrowUp, AlertTriangle, Ruler, RotateCcw, TrendingUp, Zap } from "lucide-react";
 
 const Dashboard = () => {
@@ -30,15 +31,36 @@ const Dashboard = () => {
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let hasResolved = false;
+    const timeoutId = window.setTimeout(() => {
+      if (!hasResolved) {
+        setError("Initialization timed out. Check Firebase credentials/rules and network.");
+        setLoading(false);
+      }
+    }, 12000);
+
+    const resolveLoading = () => {
+      hasResolved = true;
+      window.clearTimeout(timeoutId);
+    };
 
     const init = async () => {
       try {
         await startSession();
-        unsubscribe = subscribeLiftLogs((data) => {
-          setRecords(data);
-          setLoading(false);
-        });
+        unsubscribe = subscribeLiftLogs(
+          (data) => {
+            resolveLoading();
+            setRecords(data);
+            setLoading(false);
+          },
+          (err) => {
+            resolveLoading();
+            setError(err.message || "Failed to read lift logs from Firebase.");
+            setLoading(false);
+          },
+        );
       } catch (err: any) {
+        resolveLoading();
         setError(err.message);
         setLoading(false);
       }
@@ -51,7 +73,10 @@ const Dashboard = () => {
       Notification.requestPermission();
     }
 
-    return () => unsubscribe?.();
+    return () => {
+      window.clearTimeout(timeoutId);
+      unsubscribe?.();
+    };
   }, []);
 
   // Browser notifications for unsafe events
@@ -178,8 +203,10 @@ const Dashboard = () => {
       </div>
 
       {/* Status + Trend + Peak Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <StatusCard record={latestRecord} />
+
+        <LiftVehicleAnimation record={latestRecord} />
 
         <div className="card-surface p-4 flex flex-col justify-center card-accent-blue">
           <div className="flex items-center gap-2 mb-2">
