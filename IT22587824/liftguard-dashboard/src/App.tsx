@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Dashboard from "./pages/Dashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import ChatbotPopup from "./components/ChatbotPopup.tsx";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +18,6 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <ChatbotPopup />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

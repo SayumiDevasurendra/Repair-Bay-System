@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   FiMessageCircle,
   FiSend,
@@ -8,12 +9,25 @@ import {
   FiZap,
 } from 'react-icons/fi';
 
-const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:8000/chat';
+const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:8010/chat';
+
+const DEFAULT_CONTEXT = {
+  moduleName: 'Repair Bay Overview',
+  status: 'INFO',
+  headline: 'Open a dashboard module to ask grounded questions about current sensor conditions.',
+  metrics: {},
+  alerts: [],
+  recommendedActions: [
+    'Open gas, temperature, noise, or lift monitoring to receive module-specific answers.',
+  ],
+};
 
 function ChatbotPopup() {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [input, setInput] = useState('');
+  const [contextByRoute, setContextByRoute] = useState({});
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -23,8 +37,40 @@ function ChatbotPopup() {
     },
   ]);
   const nextIdRef = useRef(2);
+  const activePage = location.pathname;
+  const activeContext = contextByRoute[activePage] || DEFAULT_CONTEXT;
 
   const canSend = useMemo(() => input.trim().length > 0 && !isLoading, [input, isLoading]);
+
+  useEffect(() => {
+    const handleDashboardSummary = (event) => {
+      const detail = event?.detail;
+      if (!detail?.route || !detail?.context) return;
+
+      setContextByRoute((prev) => ({
+        ...prev,
+        [detail.route]: detail.context,
+      }));
+    };
+
+    const handleFrameMessage = (event) => {
+      const data = event?.data;
+      if (!data || data.type !== 'repair-bay-dashboard-context' || !data.route || !data.context) return;
+
+      setContextByRoute((prev) => ({
+        ...prev,
+        [data.route]: data.context,
+      }));
+    };
+
+    window.addEventListener('repair-bay-dashboard-context', handleDashboardSummary);
+    window.addEventListener('message', handleFrameMessage);
+
+    return () => {
+      window.removeEventListener('repair-bay-dashboard-context', handleDashboardSummary);
+      window.removeEventListener('message', handleFrameMessage);
+    };
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +87,11 @@ function ChatbotPopup() {
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({
+          question,
+          activePage,
+          dashboardContext: activeContext,
+        }),
       });
 
       if (!res.ok) {
@@ -61,7 +111,7 @@ function ChatbotPopup() {
         {
           id: nextIdRef.current++,
           role: 'assistant',
-          content: 'Connection issue. Make sure the chatbot API is running on port 8000.',
+          content: 'Connection issue. Make sure the chatbot API is running on port 8010.',
         },
       ]);
     } finally {
@@ -80,7 +130,7 @@ function ChatbotPopup() {
               </div>
               <div>
                 <p className="chatbot-title">Safety Assistant</p>
-                <p className="chatbot-subtitle">Vehicle Bay Chatbot</p>
+                <p className="chatbot-subtitle">{activeContext.moduleName || 'Vehicle Bay Chatbot'}</p>
               </div>
             </div>
             <button
@@ -129,7 +179,7 @@ function ChatbotPopup() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about repair-bay safety..."
+              placeholder={`Ask about ${activeContext.moduleName || 'repair-bay safety'}...`}
               className="chatbot-input"
             />
             <button type="submit" className="chatbot-send" disabled={!canSend} aria-label="Send message">

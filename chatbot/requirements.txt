@@ -1,7 +1,3 @@
 fastapi
 uvicorn
-pandas
-faiss-cpu
-openai
-python-multipart
-pickle-mixin
+requests

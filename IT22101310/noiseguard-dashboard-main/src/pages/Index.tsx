@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNoiseData } from "@/hooks/useNoiseData";
 import { filterByDate, getTodayDateStr, getYesterdayDateStr, computeRollingAverage, computeDailySummary, computeHourlyData, generateCSV, downloadCSV } from "@/lib/analytics";
 import StatusCard from "@/components/dashboard/StatusCard";
@@ -24,6 +24,41 @@ const Index = () => {
   const hourlyData = useMemo(() => computeHourlyData(todayRecords), [todayRecords]);
 
   const latestRecord = todayRecords.length > 0 ? todayRecords[todayRecords.length - 1] : null;
+
+  useEffect(() => {
+    const dashboardSummary = {
+      moduleName: "Noise Exposure Monitoring",
+      status: latestRecord?.status || "NORMAL",
+      headline: `Current noise level is ${latestRecord?.avg_db ?? 0} dB with ${summary.dangerCount} danger incidents today.`,
+      metrics: {
+        currentDb: latestRecord?.avg_db ?? 0,
+        averageNoiseToday: summary.averageNoise,
+        peakNoiseToday: summary.peakDb,
+        peakTime: summary.peakTime,
+        dangerMinutes: summary.dangerMinutes,
+        safetyScore: summary.safetyScore,
+        totalRecords: summary.totalRecords,
+      },
+      alerts: [
+        `${summary.dangerCount} danger incidents today`,
+        `${summary.warningCount} warning incidents today`,
+      ],
+      recommendedActions: [
+        (latestRecord?.status === "DANGER" || summary.dangerCount > 0)
+          ? "Reduce exposure time, use hearing protection, and inspect noisy equipment."
+          : "Keep monitoring the live noise trend and maintain hearing-safety controls.",
+      ],
+    };
+
+    window.parent?.postMessage(
+      {
+        type: "repair-bay-dashboard-context",
+        route: "/noise-monitoring",
+        context: dashboardSummary,
+      },
+      "*",
+    );
+  }, [latestRecord, summary]);
 
   const handleExport = () => {
     const csv = generateCSV(todayRecords);

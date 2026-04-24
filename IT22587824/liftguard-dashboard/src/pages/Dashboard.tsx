@@ -113,6 +113,43 @@ const Dashboard = () => {
   const yesterdayAvg = getAverageAlignment(yesterdayRecords);
   const trendPct = yesterdayAvg > 0 ? ((todayAvg - yesterdayAvg) / yesterdayAvg) * 100 : 0;
 
+  useEffect(() => {
+    const summary = {
+      moduleName: "Vehicle Lift Safety Monitoring",
+      status: latestRecord?.status ?? "SAFE",
+      headline: `Current alignment difference is ${mmToCm(latestRecord?.alignmentDiff ?? 0).toFixed(2)} cm with ${unsafeToday} unsafe events today.`,
+      metrics: {
+        leftDistanceCm: mmToCm(latestRecord?.leftDistance ?? 0).toFixed(2),
+        rightDistanceCm: mmToCm(latestRecord?.rightDistance ?? 0).toFixed(2),
+        alignmentDiffCm: mmToCm(latestRecord?.alignmentDiff ?? 0).toFixed(2),
+        tiltX: (latestRecord?.tiltX ?? 0).toFixed(1),
+        tiltY: (latestRecord?.tiltY ?? 0).toFixed(1),
+        safetyScore,
+        unsafeToday,
+        todayAverageAlignmentCm: mmToCm(todayAvg).toFixed(2),
+        trendPercent: trendPct.toFixed(1),
+      },
+      alerts: [
+        `${unsafeToday} unsafe lift events recorded today`,
+        peakError ? `Peak alignment error ${mmToCm(peakError.alignmentDiff).toFixed(2)} cm` : "No peak error recorded today",
+      ],
+      recommendedActions: [
+        latestRecord?.status === "UNSAFE"
+          ? "Stop the lift operation, rebalance the load, and inspect alignment sensors."
+          : "Continue monitoring the alignment and compare with the hourly risk chart.",
+      ],
+    };
+
+    window.parent?.postMessage(
+      {
+        type: "repair-bay-dashboard-context",
+        route: "/vehicle-lift-monitoring",
+        context: summary,
+      },
+      "*",
+    );
+  }, [latestRecord, peakError, safetyScore, todayAvg, trendPct, unsafeToday]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
