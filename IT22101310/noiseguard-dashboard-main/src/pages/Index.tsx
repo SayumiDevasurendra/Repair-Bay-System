@@ -39,6 +39,15 @@ const Index = () => {
         safetyScore: summary.safetyScore,
         totalRecords: summary.totalRecords,
       },
+      recentRecords: todayRecords
+        .slice(-10)
+        .reverse()
+        .map((record) => ({
+          date: record.date,
+          time: record.time,
+          avg_db: record.avg_db,
+          status: record.status,
+        })),
       alerts: [
         `${summary.dangerCount} danger incidents today`,
         `${summary.warningCount} warning incidents today`,
@@ -58,7 +67,7 @@ const Index = () => {
       },
       "*",
     );
-  }, [latestRecord, summary]);
+  }, [latestRecord, summary, todayRecords]);
 
   const handleExport = () => {
     const csv = generateCSV(todayRecords);

@@ -131,9 +131,46 @@ def find_metric(metrics: dict[str, Any], candidates: list[str]) -> tuple[str, An
     return None, None
 
 
+def normalize_datetime_tokens(text: str) -> set[str]:
+    normalized = text.lower()
+    replacements = {
+        "/": "-",
+        ".": ":",
+        ",": " ",
+        "t": " ",
+    }
+    for old, new in replacements.items():
+        normalized = normalized.replace(old, new)
+
+    tokens = set(normalized.split())
+    compact = normalized.replace(" ", "")
+    if compact:
+        tokens.add(compact)
+    return {token for token in tokens if token}
+
+
+def match_recent_record(question: str, recent_records: list[dict[str, Any]]) -> str | None:
+    if not recent_records:
+        return None
+
+    question_tokens = normalize_datetime_tokens(question)
+    for record in recent_records:
+        date = str(record.get("date") or "")
+        time = str(record.get("time") or "")
+        avg_db = record.get("avg_db")
+        status = str(record.get("status") or "UNKNOWN")
+
+        record_tokens = normalize_datetime_tokens(f"{date} {time}")
+        if question_tokens & record_tokens:
+            return f"At {date} {time}, the recorded average noise level was {avg_db} dB with status {status}."
+
+    return None
+
+
 def answer_from_dashboard_context(question: str, active_page: str | None, dashboard_context: dict[str, Any] | None) -> str | None:
     context = dashboard_context or {}
     metrics = context.get("metrics") or {}
+    recent_records = context.get("recentRecords") or []
     module_name = context.get("moduleName") or active_page or "this dashboard"
     status = str(context.get("status") or "UNKNOWN")
     headline = context.get("headline")
@@ -143,6 +180,11 @@ def answer_from_dashboard_context(question: str, active_page: str | None, dashbo
 
     if not metrics and not headline and not alerts:
         return None
+
+    if "date" in question_lower or "time" in question_lower or any(char.isdigit() for char in question_lower):
+        matched_record = match_recent_record(question, recent_records)
+        if matched_record:
+            return matched_record
 
     if "status" in question_lower or "safe" in question_lower or "danger" in question_lower or "warning" in question_lower:
         answer = f"The current status for {module_name} is {status}."
