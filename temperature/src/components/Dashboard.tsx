@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Thermometer, TrendingDown, TrendingUp, Activity, Pause, Play, Wifi } from 'lucide-react'
 import { useTemperatureData } from '../hooks/useTemperatureData'
 import { calcStats, formatDate, formatTimestamp, toFahrenheit } from '../utils/temperatureUtils'
@@ -21,6 +22,40 @@ export default function Dashboard() {
 
   const headerIcon = isDanger ? 'text-red-400' : isWarning ? 'text-yellow-400' : 'text-green-400'
   const headerBg   = isDanger ? 'bg-red-500/20' : isWarning ? 'bg-yellow-500/20' : 'bg-green-500/20'
+
+  useEffect(() => {
+    const summary = {
+      moduleName: 'Temperature and Fire Risk Monitoring',
+      status: current.status,
+      headline: `Current temperature is ${current.temperature_c.toFixed(1)} C with ${alerts.length} warning or danger alerts in the log.`,
+      metrics: {
+        currentTemperatureC: current.temperature_c.toFixed(1),
+        minTemperatureC: stats.min.toFixed(1),
+        maxTemperatureC: stats.max.toFixed(1),
+        averageTemperatureC: stats.avg.toFixed(1),
+        totalReadings: history.length,
+        dataSource: isLive ? 'Firebase' : 'Demo mode',
+        connection: connected ? 'connected' : 'disconnected',
+      },
+      alerts: alerts.slice(0, 3).map((alert) => `${alert.status} at ${alert.temperature_c} C on ${alert.timestamp}`),
+      recommendedActions: [
+        isDanger
+          ? 'Check for overheating or fire risk immediately and inspect the affected bay.'
+          : isWarning
+            ? 'Increase observation and confirm that the temperature does not continue rising.'
+            : 'Maintain routine monitoring and review the history chart for changes.',
+      ],
+    }
+
+    window.parent?.postMessage(
+      {
+        type: 'repair-bay-dashboard-context',
+        route: '/temperature-monitoring',
+        context: summary,
+      },
+      '*',
+    )
+  }, [alerts, connected, current, history.length, isDanger, isLive, isWarning, stats.avg, stats.max, stats.min])
 
   return (
     <div className={`min-h-screen bg-slate-900 text-white transition-colors duration-500
