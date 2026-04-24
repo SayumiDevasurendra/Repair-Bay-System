@@ -1,0 +1,8 @@
+{
+  "name": "repair-bay-system",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "powershell -ExecutionPolicy Bypass -File ./scripts/dev-runner.ps1"
+  }
+}

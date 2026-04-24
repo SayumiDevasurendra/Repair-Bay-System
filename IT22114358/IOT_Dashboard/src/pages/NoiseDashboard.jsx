@@ -57,7 +57,7 @@ function NoiseDashboard() {
             <path d="M31 18C32.5 19.5 33.5 21.5 33.5 24C33.5 26.5 32.5 28.5 31 30" stroke="#475569" strokeWidth="2.5" strokeLinecap="round" />
           </svg>
           <p style={{ fontSize: '15px', color: '#94a3b8', margin: 0 }}>Noise module server is not running</p>
-          <p style={{ fontSize: '12px', color: '#475569', margin: 0 }}>Start it with:</p>
+          <p style={{ fontSize: '12px', color: '#475569', margin: 0 }}>Start the full system with:</p>
           <code style={{
             background: '#1e293b',
             border: '1px solid #334155',
@@ -66,7 +66,7 @@ function NoiseDashboard() {
             fontSize: '12px',
             color: '#7dd3fc',
           }}>
-            cd IT22101310/noiseguard-dashboard-main &amp;&amp; npm run dev
+            npm run dev
           </code>
           <button
             onClick={() => { setLoaded(false); window.location.reload(); }}

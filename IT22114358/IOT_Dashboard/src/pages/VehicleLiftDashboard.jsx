@@ -59,7 +59,7 @@ function VehicleLiftDashboard() {
             <rect x="18" y="14" width="12" height="6" rx="2" stroke="#475569" strokeWidth="2" />
           </svg>
           <p style={{ fontSize: '15px', color: '#94a3b8', margin: 0 }}>Vehicle Lift module server is not running</p>
-          <p style={{ fontSize: '12px', color: '#475569', margin: 0 }}>Start it with:</p>
+          <p style={{ fontSize: '12px', color: '#475569', margin: 0 }}>Start the full system with:</p>
           <code style={{
             background: '#1e293b',
             border: '1px solid #334155',
@@ -68,7 +68,7 @@ function VehicleLiftDashboard() {
             fontSize: '12px',
             color: '#7dd3fc',
           }}>
-            cd IT22587824/liftguard-dashboard &amp;&amp; npm run dev
+            npm run dev
           </code>
           <button
             onClick={() => { setLoaded(false); window.location.reload(); }}
