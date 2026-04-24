@@ -202,10 +202,13 @@ def answer_from_dashboard_context(question: str, active_page: str | None, dashbo
         (["tilt y"], ["tiltY"]),
         (["safety score"], ["safetyScore"]),
         (["gas ppm", "current gas", "ppm"], ["currentPpm", "peakPpm", "averagePpm"]),
+        (["min", "minimum", "lowest"], ["minTemperatureC"]),
+        (["max", "maximum", "highest"], ["maxTemperatureC", "peakPpm"]),
         (["temperature", "current temperature"], ["currentTemperatureC", "averageTemperatureC", "maxTemperatureC"]),
         (["average"], ["averagePpm", "averageTemperatureC", "todayAverageAlignmentCm", "liveAverage"]),
         (["peak"], ["peakPpm", "maxTemperatureC"]),
         (["trend"], ["trend", "trendPercent"]),
+        (["total readings", "all readings", "reading count"], ["totalReadings", "recentSamples"]),
     ]
 
     for phrases, metric_keys in direct_metric_map:
