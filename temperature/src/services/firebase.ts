@@ -23,6 +23,14 @@ function sortedValues(obj: Record<string, unknown>): unknown[] {
   return Object.keys(obj).sort().map((k) => obj[k])
 }
 
+function isTemperatureReading(data: unknown): data is Record<string, unknown> {
+  return (
+    !!data &&
+    typeof data === 'object' &&
+    ('temperature_c' in data || 'temperature' in data)
+  )
+}
+
 export function subscribeToTemperature(
   onEvent: Listener,
   onError?: (e: Event) => void,
@@ -45,7 +53,7 @@ export function subscribeToTemperature(
       if (path === '/') {
         // ── Initial full snapshot ─────────────────────────────────────────────
         if (!data) return
-        if (typeof data === 'object' && 'temperature_c' in (data as object)) {
+        if (isTemperatureReading(data)) {
           // Listening directly on a single node
           onEvent({ kind: 'snapshot', readings: [data] })
         } else {
@@ -54,7 +62,7 @@ export function subscribeToTemperature(
         }
       } else {
         // ── Single new child: path is "/-NxyzKey" ────────────────────────────
-        if (data && typeof data === 'object' && 'temperature_c' in (data as object)) {
+        if (isTemperatureReading(data)) {
           onEvent({ kind: 'new', reading: data })
         }
       }
@@ -69,7 +77,7 @@ export function subscribeToTemperature(
       const parsed = JSON.parse(e.data) as { path: string; data: unknown }
       const { data } = parsed
       if (!data || typeof data !== 'object') return
-      if ('temperature_c' in (data as object)) {
+      if (isTemperatureReading(data)) {
         onEvent({ kind: 'new', reading: data })
       }
     } catch (err) {

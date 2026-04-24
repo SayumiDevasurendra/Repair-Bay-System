@@ -9,17 +9,23 @@ const DEMO_INTERVAL_MS = 2000
 function parseReading(raw: unknown): TemperatureReading | null {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Record<string, unknown>
+  const rawTemp = r.temperature_c ?? r.temperature
   const temp =
-    typeof r.temperature_c === 'number'
-      ? r.temperature_c
-      : parseFloat(r.temperature_c as string)
+    typeof rawTemp === 'number'
+      ? rawTemp
+      : parseFloat(rawTemp as string)
   if (isNaN(temp)) return null
   const timestamp =
     typeof r.timestamp === 'string'
       ? r.timestamp
       : new Date().toISOString().replace('T', ' ').slice(0, 19)
+  const rawStatus = typeof r.status === 'string' ? r.status.toUpperCase() : ''
   const status =
-    typeof r.status === 'string' ? r.status : deriveStatus(temp)
+    rawStatus === 'NORMAL'
+      ? 'Normal'
+      : rawStatus === 'WARNING' || rawStatus === 'DANGER'
+        ? rawStatus
+        : deriveStatus(temp)
   return {
     temperature_c: Math.round(temp * 10) / 10,
     status: status as TemperatureReading['status'],
