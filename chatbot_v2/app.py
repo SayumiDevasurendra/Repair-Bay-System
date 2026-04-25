@@ -227,7 +227,6 @@ class SafetyKnowledgeBase:
                 f"There are {count} {target['value']} {target['label']} records in the dataset."
             )
 
-        lines.append(f"Dataset checked: {len(self.df)} rows.")
         return "\n".join(lines)
 
     def _status_targets(self, lowered_question: str, domains: list[str]) -> list[dict[str, str]]:
