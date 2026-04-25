@@ -7,7 +7,7 @@ type Message = {
   content: string;
 };
 
-const API_URL = import.meta.env.VITE_CHATBOT_API_URL || "http://127.0.0.1:8000/chat";
+const API_URL = import.meta.env.VITE_CHATBOT_API_URL || "http://127.0.0.1:4362/chat";
 
 const ChatbotPopup = () => {
   const [open, setOpen] = useState(false);
@@ -64,7 +64,7 @@ const ChatbotPopup = () => {
         {
           id: nextIdRef.current++,
           role: "assistant",
-          content: "Connection issue. Please check if the chatbot API is running on port 8000.",
+          content: "Connection issue. Please check if the chatbot API is running on port 4362.",
         },
       ]);
     } finally {

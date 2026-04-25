@@ -9,7 +9,7 @@ import {
   FiZap,
 } from 'react-icons/fi';
 
-const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:8010/chat';
+const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:4362/chat';
 
 const DEFAULT_CONTEXT = {
   moduleName: 'Repair Bay Overview',
@@ -111,7 +111,7 @@ function ChatbotPopup() {
         {
           id: nextIdRef.current++,
           role: 'assistant',
-          content: 'Connection issue. Make sure the chatbot API is running on port 8010.',
+          content: 'Connection issue. Make sure the chatbot API is running on port 4362.',
         },
       ]);
     } finally {

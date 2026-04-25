@@ -6,21 +6,31 @@ $services = @(
     Name = "shell"
     Color = "Cyan"
     Path = Join-Path $root "IT22114358\IOT_Dashboard"
+    Type = "npm"
   },
   @{
     Name = "temperature"
     Color = "Yellow"
     Path = Join-Path $root "temperature"
+    Type = "npm"
   },
   @{
     Name = "noise"
     Color = "Magenta"
     Path = Join-Path $root "IT22101310\noiseguard-dashboard-main"
+    Type = "npm"
   },
   @{
     Name = "lift"
     Color = "Green"
     Path = Join-Path $root "IT22587824\liftguard-dashboard"
+    Type = "npm"
+  },
+  @{
+    Name = "chatbot"
+    Color = "Blue"
+    Path = Join-Path $root "chatbot"
+    Type = "fastapi"
   }
 )
 
@@ -43,19 +53,31 @@ function Stop-AllJobs {
 
 try {
   Write-Host "Starting Repair Bay System..."
-  Write-Host "Shell dashboard: http://localhost:3000"
-  Write-Host "Temperature: http://localhost:8099"
-  Write-Host "Noise: http://localhost:8080"
-  Write-Host "Lift: http://localhost:8081"
+  Write-Host "Shell dashboard: http://localhost:4358"
+  Write-Host "Temperature: http://localhost:4359"
+  Write-Host "Noise: http://localhost:4360"
+  Write-Host "Lift: http://localhost:4361"
+  Write-Host "Chatbot API: http://127.0.0.1:4362"
   Write-Host "Press Ctrl+C to stop everything."
   Write-Host ""
 
   foreach ($service in $services) {
-    $job = Start-Job -Name $service.Name -ArgumentList $service.Path -ScriptBlock {
-      param($servicePath)
+    $job = Start-Job -Name $service.Name -ArgumentList $service.Path, $service.Type, $root -ScriptBlock {
+      param($servicePath, $serviceType, $repoRoot)
 
       Set-Location $servicePath
-      npm run dev 2>&1
+      if ($serviceType -eq "fastapi") {
+        $pythonExe = Join-Path $repoRoot "venv\Scripts\python.exe"
+        if (Test-Path $pythonExe) {
+          & $pythonExe -m uvicorn main:app --host 127.0.0.1 --port 4362 --reload 2>&1
+        }
+        else {
+          python -m uvicorn main:app --host 127.0.0.1 --port 4362 --reload 2>&1
+        }
+      }
+      else {
+        npm run dev 2>&1
+      }
     }
 
     $jobs += [PSCustomObject]@{
