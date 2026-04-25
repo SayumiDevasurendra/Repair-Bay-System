@@ -495,6 +495,7 @@ def ask_ai(question: str, evidence: dict[str, Any]) -> tuple[str | None, dict[st
 
     last_error = None
     for model in models:
+        print(f"[OpenRouter] Calling model: {model}")
         try:
             session = requests.Session()
             session.trust_env = False
@@ -521,6 +522,7 @@ def ask_ai(question: str, evidence: dict[str, Any]) -> tuple[str | None, dict[st
             )
             if not response.ok:
                 last_error = f"{response.status_code}: {response.text[:700]}"
+                print(f"[OpenRouter] Failed model: {model} | {last_error}")
                 continue
             data = response.json()
             content = data.get("choices", [{}])[0].get("message", {}).get("content")
@@ -528,15 +530,20 @@ def ask_ai(question: str, evidence: dict[str, Any]) -> tuple[str | None, dict[st
                 content = "".join(part.get("text", "") if isinstance(part, dict) else str(part) for part in content)
             if not content or not str(content).strip():
                 last_error = f"Empty response from {model}: {json.dumps(data)[:700]}"
+                print(f"[OpenRouter] Empty response from model: {model}")
                 continue
+            resolved_model = data.get("model", model)
+            print(f"[OpenRouter] Success model: {resolved_model}")
             return str(content).strip(), {
                 "ok": True,
                 "provider": "openrouter",
-                "model": data.get("model", model),
+                "model": resolved_model,
             }
         except Exception as exc:
             last_error = str(exc)
+            print(f"[OpenRouter] Error model: {model} | {last_error}")
 
+    print(f"[OpenRouter] All models failed: {last_error}")
     return None, {"ok": False, "provider": "openrouter", "modelsTried": models, "error": last_error}
 
 
