@@ -8,7 +8,7 @@ type Message = {
   content: string
 }
 
-const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:8000/chat'
+const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:8010/chat'
 
 export default function ChatbotPopup() {
   const [open, setOpen] = useState(false)
@@ -41,7 +41,7 @@ export default function ChatbotPopup() {
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, activePage: '/temperature-monitoring' }),
       })
 
       if (!res.ok) {
@@ -65,7 +65,7 @@ export default function ChatbotPopup() {
         {
           id: nextIdRef.current++,
           role: 'assistant',
-          content: 'Connection issue. Please check if the chatbot API is running on port 8000.',
+          content: 'Connection issue. Please check if the chatbot API is running on port 8010.',
         },
       ])
     } finally {

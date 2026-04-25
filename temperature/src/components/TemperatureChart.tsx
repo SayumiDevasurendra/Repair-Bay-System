@@ -34,12 +34,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null
 }
 
-function getGradientColor(temp: number) {
-  if (temp >= 70) return '#ef4444'
-  if (temp >= 50) return '#eab308'
-  return '#22c55e'
-}
-
 type Filter = 'all' | 'alerts'
 
 export default function TemperatureChart({ history }: Props) {

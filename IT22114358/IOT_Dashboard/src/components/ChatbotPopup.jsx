@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   FiMessageCircle,
   FiSend,
@@ -8,9 +9,10 @@ import {
   FiZap,
 } from 'react-icons/fi';
 
-const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:8000/chat';
+const API_URL = import.meta.env.VITE_CHATBOT_API_URL || 'http://127.0.0.1:8010/chat';
 
 function ChatbotPopup() {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [input, setInput] = useState('');
@@ -24,6 +26,7 @@ function ChatbotPopup() {
   ]);
   const nextIdRef = useRef(2);
 
+  const activePage = location.pathname;
   const canSend = useMemo(() => input.trim().length > 0 && !isLoading, [input, isLoading]);
 
   const onSubmit = async (e) => {
@@ -41,7 +44,7 @@ function ChatbotPopup() {
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, activePage }),
       });
 
       if (!res.ok) {
@@ -61,7 +64,7 @@ function ChatbotPopup() {
         {
           id: nextIdRef.current++,
           role: 'assistant',
-          content: 'Connection issue. Make sure the chatbot API is running on port 8000.',
+          content: 'Connection issue. Make sure the chatbot API is running on port 8010.',
         },
       ]);
     } finally {

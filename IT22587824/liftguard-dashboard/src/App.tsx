@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.tsx";
 import ChatbotPopup from "./components/ChatbotPopup.tsx";
 
 const queryClient = new QueryClient();
+const isEmbedded = window.self !== window.top;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -19,7 +20,7 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <ChatbotPopup />
+        {!isEmbedded && <ChatbotPopup />}
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
