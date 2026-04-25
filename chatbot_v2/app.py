@@ -18,8 +18,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 BASE_DIR = Path(__file__).resolve().parent
 DATASET_PATH = BASE_DIR / "safety_monitoring_dataset.xlsx"
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-CHATBOT_VERSION = "2.1-direct-counts"
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+CHATBOT_VERSION = "2.3-openrouter-evidence"
 
 DOMAINS = {
     "temperature": {
@@ -116,13 +116,37 @@ class SafetyKnowledgeBase:
         ).lower()
 
     def detect_domains(self, question: str, active_page: str = "") -> list[str]:
-        lowered = f"{question} {active_page}".lower()
+        lowered_question = question.lower()
+        generic_words = [
+            "overall",
+            "hazard",
+            "hazards",
+            "safety condition",
+            "safety report",
+            "repair bay",
+            "dataset",
+            "main safety",
+            "most important",
+            "compare",
+        ]
+        if any(word in lowered_question for word in generic_words):
+            return list(DOMAINS)
+
         found = [
             name
             for name, config in DOMAINS.items()
-            if any(keyword in lowered for keyword in config["keywords"])
+            if any(keyword in lowered_question for keyword in config["keywords"])
         ]
-        return found or list(DOMAINS)
+        if found:
+            return found
+
+        lowered_page = active_page.lower()
+        page_domains = [
+            name
+            for name, config in DOMAINS.items()
+            if any(keyword in lowered_page for keyword in config["keywords"])
+        ]
+        return page_domains or list(DOMAINS)
 
     def retrieve(self, question: str, limit: int = 8) -> list[RetrievedRow]:
         query = self._expand_query(question)
@@ -155,6 +179,10 @@ class SafetyKnowledgeBase:
         direct_answer = self.direct_answer(question, domains)
         if direct_answer:
             return direct_answer
+
+        explanation = self.explanation_answer(question, domains)
+        if explanation:
+            return explanation
 
         summary = self.summary(domains)
         lines = [
@@ -199,6 +227,112 @@ class SafetyKnowledgeBase:
             )
 
         return "\n".join(lines)
+
+    def explanation_answer(self, question: str, domains: list[str]) -> str | None:
+        lowered = question.lower()
+        explanation_words = [
+            "explain",
+            "why",
+            "hazard",
+            "hazards",
+            "safe overall",
+            "safety condition",
+            "safety report",
+            "most important",
+            "what should",
+            "recommend",
+            "actions",
+            "compare",
+            "risky",
+            "problem",
+            "problems",
+        ]
+        if not any(word in lowered for word in explanation_words):
+            return None
+
+        insights = self.safety_insights(domains)
+
+        if "noise" in domains and "lifting" in domains and "safe" in lowered:
+            noise = insights["domains"]["noise"]
+            lift = insights["domains"]["lifting"]
+            return (
+                "No, the noise and lift conditions are not safe overall.\n"
+                f"Noise has {noise['unsafe_count']} unsafe records "
+                f"({noise['unsafe_percent']}%): {noise['risk_breakdown']}.\n"
+                f"Lifting has {lift['unsafe_count']} Critical records "
+                f"({lift['unsafe_percent']}%).\n"
+                "Because both areas show many unsafe readings, technicians should reduce noise exposure and inspect lift alignment before continuing high-risk work."
+            )
+
+        ranked = [
+            (domain, info)
+            for domain, info in insights["domains"].items()
+            if domain in domains
+        ]
+        ranked.sort(key=lambda item: item[1]["unsafe_count"], reverse=True)
+
+        lines = ["The most important hazards shown in the dataset are:"]
+        for index, (domain, info) in enumerate(ranked[:4], start=1):
+            lines.append(
+                f"{index}. {info['hazard_name']}: {info['unsafe_count']} unsafe records "
+                f"({info['unsafe_percent']}%). {info['risk_breakdown']}."
+            )
+
+        overall = insights["overall"]
+        lines.append(
+            f"Overall safety is heavily weighted toward Emergency records: "
+            f"{overall.get('Emergency', 0)} Emergency, {overall.get('Alert', 0)} Alert, and {overall.get('Safe', 0)} Safe."
+        )
+        lines.append(
+            "Priority actions: handle gas warnings/critical leaks first, reduce high fire-risk temperature conditions, control dangerous noise exposure, and stop lift use when lift status is Critical."
+        )
+        return "\n".join(lines)
+
+    def safety_insights(self, domains: list[str]) -> dict[str, Any]:
+        insights: dict[str, Any] = {
+            "rows": int(len(self.df)),
+            "overall": self._counts("Overall_Safety_Status"),
+            "domains": {},
+        }
+
+        if "gas" in domains:
+            counts = self._counts("Gas_Leak_Status")
+            unsafe = counts.get("Warning", 0) + counts.get("Critical", 0)
+            insights["domains"]["gas"] = {
+                "hazard_name": "Gas leak risk",
+                "unsafe_count": unsafe,
+                "unsafe_percent": self._percent(unsafe),
+                "risk_breakdown": f"{counts.get('Critical', 0)} Critical, {counts.get('Warning', 0)} Warning, {counts.get('Safe', 0)} Safe",
+            }
+        if "temperature" in domains:
+            counts = self._counts("Fire_Risk_Level")
+            unsafe = counts.get("High", 0) + counts.get("Medium", 0)
+            insights["domains"]["temperature"] = {
+                "hazard_name": "Temperature/fire risk",
+                "unsafe_count": unsafe,
+                "unsafe_percent": self._percent(unsafe),
+                "risk_breakdown": f"{counts.get('High', 0)} High, {counts.get('Medium', 0)} Medium, {counts.get('Low', 0)} Low",
+            }
+        if "noise" in domains:
+            counts = self._counts("Noise_Risk")
+            unsafe = counts.get("Dangerous", 0) + counts.get("Risky", 0)
+            insights["domains"]["noise"] = {
+                "hazard_name": "Noise exposure",
+                "unsafe_count": unsafe,
+                "unsafe_percent": self._percent(unsafe),
+                "risk_breakdown": f"{counts.get('Dangerous', 0)} Dangerous, {counts.get('Risky', 0)} Risky, {counts.get('Safe', 0)} Safe",
+            }
+        if "lifting" in domains:
+            counts = self._counts("Lift_Status")
+            unsafe = counts.get("Critical", 0)
+            insights["domains"]["lifting"] = {
+                "hazard_name": "Lift alignment risk",
+                "unsafe_count": unsafe,
+                "unsafe_percent": self._percent(unsafe),
+                "risk_breakdown": f"{counts.get('Critical', 0)} Critical, {counts.get('Normal', 0)} Normal",
+            }
+
+        return insights
 
     def direct_answer(self, question: str, domains: list[str]) -> str | None:
         lowered = question.lower()
@@ -333,36 +467,77 @@ class SafetyKnowledgeBase:
     def _round(self, value: Any) -> float:
         return round(float(value), 2)
 
+    def _percent(self, count: int) -> float:
+        return round((count / len(self.df)) * 100, 1)
 
-def ask_gemini(question: str, evidence: dict[str, Any]) -> str | None:
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    model = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+
+def ask_ai(question: str, evidence: dict[str, Any]) -> tuple[str | None, dict[str, Any]]:
+    api_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+    models = [
+        item.strip()
+        for item in os.getenv("OPENROUTER_MODELS", os.getenv("OPENROUTER_MODEL", "google/gemini-2.5-flash")).split(",")
+        if item.strip()
+    ]
     if not api_key:
-        return None
+        return None, {"ok": False, "provider": "openrouter", "error": "Missing OPENROUTER_API_KEY."}
 
-    prompt = (
-        "You are a repair-bay safety monitoring chatbot. Answer only from the JSON evidence. "
-        "If the evidence does not contain the requested fact, say that the dataset does not show it. "
-        "Be concise, include exact values/statuses, and cover temperature, lifting, noise, and gas when relevant.\n\n"
-        f"Question: {question}\n"
-        f"Evidence JSON:\n{json.dumps(evidence, indent=2)}"
+    system_prompt = (
+        "You are a repair-bay safety monitoring chatbot. "
+        "Use only the provided dataset evidence. "
+        "Do not invent values. Do not mention pandas, JSON, APIs, or tokens. "
+        "Do not list matching records unless the user asks for records. "
+        "Answer naturally with exact counts, percentages, risk labels, and practical safety actions."
+    )
+    user_prompt = (
+        f"Question: {question}\n\n"
+        f"Dataset evidence from pandas:\n{json.dumps(evidence, indent=2)}"
     )
 
-    try:
-        response = requests.post(
-            GEMINI_URL.format(model=model),
-            params={"key": api_key},
-            json={
-                "contents": [{"parts": [{"text": prompt}]}],
-                "generationConfig": {"temperature": 0.1, "topP": 0.7, "maxOutputTokens": 650},
-            },
-            timeout=20,
-        )
-        response.raise_for_status()
-        data = response.json()
-        return data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except Exception:
-        return None
+    last_error = None
+    for model in models:
+        try:
+            session = requests.Session()
+            session.trust_env = False
+            response = session.post(
+                OPENROUTER_URL,
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "http://127.0.0.1:5173",
+                    "X-Title": "Repair Bay Safety Chatbot",
+                },
+                json={
+                    "model": model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    "temperature": 0.1,
+                    "top_p": 0.7,
+                    "max_tokens": 900,
+                    "reasoning": {"enabled": False},
+                },
+                timeout=20,
+            )
+            if not response.ok:
+                last_error = f"{response.status_code}: {response.text[:700]}"
+                continue
+            data = response.json()
+            content = data.get("choices", [{}])[0].get("message", {}).get("content")
+            if isinstance(content, list):
+                content = "".join(part.get("text", "") if isinstance(part, dict) else str(part) for part in content)
+            if not content or not str(content).strip():
+                last_error = f"Empty response from {model}: {json.dumps(data)[:700]}"
+                continue
+            return str(content).strip(), {
+                "ok": True,
+                "provider": "openrouter",
+                "model": data.get("model", model),
+            }
+        except Exception as exc:
+            last_error = str(exc)
+
+    return None, {"ok": False, "provider": "openrouter", "modelsTried": models, "error": last_error}
 
 
 load_dotenv()
@@ -400,6 +575,7 @@ def chat(payload: ChatRequest):
     evidence = {
         "domains": domains,
         "summary": knowledge_base.summary(domains),
+        "insights": knowledge_base.safety_insights(domains),
         "matching_records": [{"score": item.score, "row": item.data} for item in rows],
     }
 
@@ -413,20 +589,22 @@ def chat(payload: ChatRequest):
             "evidence": evidence,
         }
 
-    gemini_answer = ask_gemini(question, evidence)
-    if gemini_answer:
+    ai_answer, ai_status = ask_ai(question, evidence)
+    if ai_answer:
         return {
-            "answer": gemini_answer,
-            "answerType": "gemini_grounded",
+            "answer": ai_answer,
+            "answerType": "ai_grounded",
             "version": CHATBOT_VERSION,
+            "ai": ai_status,
             "domains": domains,
             "evidence": evidence,
         }
 
     return {
         "answer": knowledge_base.deterministic_answer(question, domains, rows),
-        "answerType": "dataset_summary",
+        "answerType": "dataset_explanation",
         "version": CHATBOT_VERSION,
+        "ai": ai_status,
         "domains": domains,
         "evidence": evidence,
     }

@@ -1,6 +1,6 @@
 # Safety Monitoring Chatbot v2
 
-Backend API for the in-dashboard safety chatbot. It reads `safety_monitoring_dataset.xlsx`, retrieves matching dataset rows, and uses Gemini only to phrase an answer from that evidence.
+Backend API for the in-dashboard safety chatbot. It reads `safety_monitoring_dataset.xlsx`, uses pandas to prepare a small evidence packet, and sends only that evidence to OpenRouter for the final answer. The default OpenRouter model is set to `openrouter/free` for testing.
 
 ## Run
 
@@ -20,4 +20,4 @@ The visible chatbot popup is mounted inside `IT22114358/IOT_Dashboard`, so open 
 - `GET /stats`
 - `GET /health`
 
-The Gemini key is read from `chatbot_v2/.env`, which is ignored by git.
+The OpenRouter key is read from `chatbot_v2/.env`, which is ignored by git.
