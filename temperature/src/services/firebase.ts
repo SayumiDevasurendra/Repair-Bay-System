@@ -11,7 +11,9 @@ const DB_URL  = import.meta.env.VITE_FIREBASE_DATABASE_URL as string
 const TOKEN   = import.meta.env.VITE_FIREBASE_TOKEN as string
 const DB_PATH = (import.meta.env.VITE_FIREBASE_DB_PATH as string) ?? '/temperature_log'
 
-export const IS_DUMMY_TOKEN = !TOKEN || TOKEN === 'YOUR_DATABASE_SECRET_HERE'
+// Demo mode only when DB_URL is missing or token is the placeholder string.
+// An empty token is fine — the DB allows public reads.
+export const IS_DUMMY_TOKEN = !DB_URL || TOKEN === 'YOUR_DATABASE_SECRET_HERE'
 
 export type FirebaseEvent =
   | { kind: 'snapshot'; readings: unknown[] }  // initial load — all entries oldest→newest
@@ -23,6 +25,10 @@ function sortedValues(obj: Record<string, unknown>): unknown[] {
   return Object.keys(obj).sort().map((k) => obj[k])
 }
 
+function hasTempField(obj: object): boolean {
+  return 'temperature_c' in obj || 'temperature' in obj
+}
+
 export function subscribeToTemperature(
   onEvent: Listener,
   onError?: (e: Event) => void,
@@ -32,8 +38,10 @@ export function subscribeToTemperature(
     return () => {}
   }
 
-  const url = `${DB_URL}${DB_PATH}.json?auth=${TOKEN}`
-  console.log('[Firebase] Connecting to:', `${DB_URL}${DB_PATH}.json?auth=***`)
+  const url = TOKEN
+    ? `${DB_URL}${DB_PATH}.json?auth=${TOKEN}`
+    : `${DB_URL}${DB_PATH}.json`
+  console.log('[Firebase] Connecting to:', `${DB_URL}${DB_PATH}.json${TOKEN ? '?auth=***' : ''}`)
 
   const es = new EventSource(url)
 
@@ -45,7 +53,7 @@ export function subscribeToTemperature(
       if (path === '/') {
         // ── Initial full snapshot ─────────────────────────────────────────────
         if (!data) return
-        if (typeof data === 'object' && 'temperature_c' in (data as object)) {
+        if (typeof data === 'object' && hasTempField(data as object)) {
           // Listening directly on a single node
           onEvent({ kind: 'snapshot', readings: [data] })
         } else {
@@ -54,7 +62,7 @@ export function subscribeToTemperature(
         }
       } else {
         // ── Single new child: path is "/-NxyzKey" ────────────────────────────
-        if (data && typeof data === 'object' && 'temperature_c' in (data as object)) {
+        if (data && typeof data === 'object' && hasTempField(data as object)) {
           onEvent({ kind: 'new', reading: data })
         }
       }
@@ -69,7 +77,7 @@ export function subscribeToTemperature(
       const parsed = JSON.parse(e.data) as { path: string; data: unknown }
       const { data } = parsed
       if (!data || typeof data !== 'object') return
-      if ('temperature_c' in (data as object)) {
+      if (hasTempField(data as object)) {
         onEvent({ kind: 'new', reading: data })
       }
     } catch (err) {
